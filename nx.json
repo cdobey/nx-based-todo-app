@@ -2,12 +2,7 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": [
-      "default",
-      "!{projectRoot}/**/*.Tests/**/*",
-      "!{projectRoot}/**/bin/**/*",
-      "!{projectRoot}/**/obj/**/*"
-    ],
+    "production": ["default"],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
   "nxCloudId": "69188fe05d8c956830502dfb",
@@ -25,7 +20,6 @@
           "watchDepsName": "watch-deps"
         }
       }
-    },
-    "@nx/dotnet"
+    }
   ]
 }
