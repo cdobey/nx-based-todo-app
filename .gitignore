@@ -17,12 +17,13 @@ node_modules
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
+# IDE - VSCode / Rider
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+**.idea/
 
 # misc
 /.sass-cache
@@ -43,3 +44,8 @@ Thumbs.db
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+# .NET
+**/bin/
+/artifacts/
+**/obj/
