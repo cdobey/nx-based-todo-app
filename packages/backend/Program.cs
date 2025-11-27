@@ -15,6 +15,7 @@ builder.Services.AddDynamoDb(builder.Configuration);
 
 var app = builder.Build();
 
+// Initialize database table
 await app.EnsureTodoTableExists();
 
 if (app.Environment.IsDevelopment())
