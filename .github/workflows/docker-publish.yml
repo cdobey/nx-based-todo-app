@@ -1,0 +1,86 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE_NAME: ${{ github.repository }}/backend
+  DYNAMODB_IMAGE_NAME: ${{ github.repository }}/dynamodb-local
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check if backend is affected
+        id: affected
+        run: |
+          npx nx show projects --affected --base=origin/main~1 --head=HEAD > affected.txt
+          if grep -q "backend" affected.txt; then
+            echo "affected=true" >> $GITHUB_OUTPUT
+          else
+            echo "affected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip message
+        if: steps.affected.outputs.affected == 'false'
+        run: echo "Backend not affected, skipping Docker build"
+
+      - name: Log in to GitHub Container Registry
+        if: steps.affected.outputs.affected == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for backend
+        if: steps.affected.outputs.affected == 'true'
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push backend image
+        if: steps.affected.outputs.affected == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/backend
+          file: ./packages/backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+      - name: Build and push DynamoDB Local image (with custom tag)
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          docker pull amazon/dynamodb-local:latest
+          docker tag amazon/dynamodb-local:latest ${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:latest
+          docker tag amazon/dynamodb-local:latest ${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:main
+          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:main
