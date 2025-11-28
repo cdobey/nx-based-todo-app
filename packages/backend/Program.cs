@@ -1,4 +1,5 @@
 using backend.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
 
@@ -14,6 +15,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddDynamoDb(builder.Configuration);
 
 var app = builder.Build();
+
+// Configure forwarded headers for reverse proxy (Coolify)
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
+});
 
 // Initialize database table
 await app.EnsureTodoTableExists();
