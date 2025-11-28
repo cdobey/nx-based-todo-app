@@ -17,9 +17,9 @@
       - dynamodb-local
     environment:
       - AWS__ServiceURL=http://dynamodb-local:8000
-      - AWS_ACCESS_KEY_ID=dummy
-      - AWS_SECRET_ACCESS_KEY=dummy
-      - AWS_REGION=us-east-1
+      - AWS__AccessKeyId=dummy
+      - AWS__SecretAccessKey=dummy
+      - AWS__Region=us-east-1
 
 volumes:
   dynamodb-data:
