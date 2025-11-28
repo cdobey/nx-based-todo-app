@@ -18,13 +18,12 @@ var app = builder.Build();
 // Initialize database table
 await app.EnsureTodoTableExists();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+// Make OpenAPI and Scalar available in all environments
+app.MapOpenApi();
+app.MapScalarApiReference();
 
-app.UseHttpsRedirection();
+// HTTPS redirection handled by reverse proxy (Coolify)
+// app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
