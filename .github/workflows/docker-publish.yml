@@ -13,7 +13,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   BACKEND_IMAGE_NAME: ${{ github.repository }}/backend
-  DYNAMODB_IMAGE_NAME: ${{ github.repository }}/dynamodb-local
+  HELLO_WORLD_IMAGE_NAME: ${{ github.repository }}/hello-world
 
 jobs:
   build-and-push:
@@ -48,7 +48,6 @@ jobs:
         run: echo "Backend not affected, skipping Docker build"
 
       - name: Log in to GitHub Container Registry
-        if: steps.affected.outputs.affected == 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -76,11 +75,21 @@ jobs:
           tags: ${{ steps.meta-backend.outputs.tags }}
           labels: ${{ steps.meta-backend.outputs.labels }}
 
-      - name: Build and push DynamoDB Local image (with custom tag)
-        if: steps.affected.outputs.affected == 'true'
-        run: |
-          docker pull amazon/dynamodb-local:latest
-          docker tag amazon/dynamodb-local:latest ${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:latest
-          docker tag amazon/dynamodb-local:latest ${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:main
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ env.DYNAMODB_IMAGE_NAME }}:main
+      - name: Extract metadata for hello-world
+        id: meta-hello
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.HELLO_WORLD_IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push hello-world image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/hello-world
+          file: ./packages/hello-world/Dockerfile
+          push: true
+          tags: ${{ steps.meta-hello.outputs.tags }}
+          labels: ${{ steps.meta-hello.outputs.labels }}
