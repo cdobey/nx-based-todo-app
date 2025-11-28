@@ -18,7 +18,7 @@ node_modules
 *.sublime-workspace
 
 # IDE - VSCode / Rider
-.vscode/*
+**.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -49,3 +49,7 @@ Thumbs.db
 **/bin/
 /artifacts/
 **/obj/
+
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+test-output
