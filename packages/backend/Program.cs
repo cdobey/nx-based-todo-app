@@ -11,19 +11,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-builder.Services.AddOpenApi(options =>
-{
-    options.AddDocumentTransformer((document, context, cancellationToken) =>
-    {
-        // Force HTTPS in the OpenAPI spec when behind reverse proxy
-        document.Servers = 
-        [
-            new() { Url = "https://backend.dobey.dev" }
-        ];
-        return Task.CompletedTask;
-    });
-});
-
+builder.Services.AddOpenApi();
 builder.Services.AddDynamoDb(builder.Configuration);
 
 var app = builder.Build();
@@ -31,7 +19,7 @@ var app = builder.Build();
 // Configure forwarded headers for reverse proxy (Coolify)
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
 });
 
 // Initialize database table
