@@ -18,11 +18,9 @@ var app = builder.Build();
 // Initialize database table
 await app.EnsureTodoTableExists();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+// Leaving in production for now, might switch to if in dvelopment later
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
