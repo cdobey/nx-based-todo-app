@@ -56,8 +56,7 @@ export default function TodoHome() {
       await updateTodo({
         variables: {
           id: todo.id,
-          title: todo.title,
-          details: todo.details || '',
+          status: newStatus,
         },
         optimisticResponse: {
           updateTodo: {
