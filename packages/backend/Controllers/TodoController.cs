@@ -47,8 +47,16 @@ namespace backend.Controllers
             {
                 return NotFound(new { message = $"Todo with id {id} not found" });
             }
-            oldTodo.Title = item.Title;
-            oldTodo.Details = item.Details;
+            
+            // Only update fields that are provided
+            if (item.Title != null)
+            {
+                oldTodo.Title = item.Title;
+            }
+            if (item.Details != null)
+            {
+                oldTodo.Details = item.Details;
+            }
             if (item.Status.HasValue)
             {
                 oldTodo.Status = item.Status.Value;
