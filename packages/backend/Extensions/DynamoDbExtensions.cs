@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.Runtime;
 
 namespace backend.Extensions;
 
@@ -13,7 +14,13 @@ public static class DynamoDbExtensions
             {
                 ServiceURL = configuration["AWS:ServiceURL"]
             };
-            return new AmazonDynamoDBClient(config);
+            
+            // Use basic AWS credentials for local development
+            var accessKey = configuration["AWS:AccessKeyId"] ?? "dummy";
+            var secretKey = configuration["AWS:SecretAccessKey"] ?? "dummy";
+            var credentials = new BasicAWSCredentials(accessKey, secretKey);
+            
+            return new AmazonDynamoDBClient(credentials, config);
         });
 
         services.AddSingleton<IDynamoDBContext>(sp =>

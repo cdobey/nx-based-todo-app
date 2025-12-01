@@ -8,6 +8,12 @@
     },
     {
       "path": "./packages/frontend"
+    },
+    {
+      "path": "./packages/graphql-bff-e2e"
+    },
+    {
+      "path": "./packages/graphql-bff"
     }
   ]
 }

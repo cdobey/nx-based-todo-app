@@ -1,0 +1,26 @@
+{
+  "name": "@todo-app/graphql-bff-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@todo-app/graphql-bff"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "packages/graphql-bff-e2e/jest.config.cts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@todo-app/graphql-bff:build",
+          "@todo-app/graphql-bff:serve"
+        ]
+      }
+    }
+  }
+}

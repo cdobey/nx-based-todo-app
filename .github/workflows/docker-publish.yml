@@ -13,6 +13,8 @@ permissions:
 env:
   REGISTRY: ghcr.io
   BACKEND_IMAGE_NAME: ${{ github.repository }}/backend
+  FRONTEND_IMAGE_NAME: ${{ github.repository }}/frontend
+  GRAPHQL_BFF_IMAGE_NAME: ${{ github.repository }}/graphql-bff
   HELLO_WORLD_IMAGE_NAME: ${{ github.repository }}/hello-world
 
 jobs:
@@ -38,14 +40,24 @@ jobs:
         run: |
           npx nx show projects --affected --base=origin/main~1 --head=HEAD > affected.txt
           if grep -q "backend" affected.txt; then
-            echo "affected=true" >> $GITHUB_OUTPUT
+            echo "backend=true" >> $GITHUB_OUTPUT
           else
-            echo "affected=false" >> $GITHUB_OUTPUT
+            echo "backend=false" >> $GITHUB_OUTPUT
+          fi
+          if grep -q "frontend" affected.txt; then
+            echo "frontend=true" >> $GITHUB_OUTPUT
+          else
+            echo "frontend=false" >> $GITHUB_OUTPUT
+          fi
+          if grep -q "graphql-bff" affected.txt; then
+      - name: Skip message
+        if: steps.affected.outputs.backend == 'false' && steps.affected.outputs.frontend == 'false' && steps.affected.outputs.graphql-bff == 'false'
+        run: echo "No affected projects requiring Docker builds"
           fi
 
       - name: Skip message
-        if: steps.affected.outputs.affected == 'false'
-        run: echo "Backend not affected, skipping Docker build"
+        if: steps.affected.outputs.backend == 'false' && steps.affected.outputs.graphql-bff == 'false'
+        run: echo "Backend and GraphQL BFF not affected, skipping Docker builds"
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -55,7 +67,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for backend
-        if: steps.affected.outputs.affected == 'true'
+        if: steps.affected.outputs.backend == 'true'
         id: meta-backend
         uses: docker/metadata-action@v5
         with:
@@ -66,7 +78,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push backend image
-        if: steps.affected.outputs.affected == 'true'
+        if: steps.affected.outputs.backend == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./packages/backend
@@ -74,6 +86,48 @@ jobs:
           push: true
           tags: ${{ steps.meta-backend.outputs.tags }}
           labels: ${{ steps.meta-backend.outputs.labels }}
+
+      - name: Extract metadata for frontend
+        if: steps.affected.outputs.frontend == 'true'
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push frontend image
+        if: steps.affected.outputs.frontend == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+
+      - name: Extract metadata for graphql-bff
+        if: steps.affected.outputs.graphql-bff == 'true'
+        id: meta-graphql-bff
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.GRAPHQL_BFF_IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push graphql-bff image
+        if: steps.affected.outputs.graphql-bff == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/graphql-bff/Dockerfile
+          push: true
+          tags: ${{ steps.meta-graphql-bff.outputs.tags }}
+          labels: ${{ steps.meta-graphql-bff.outputs.labels }}
 
       - name: Extract metadata for hello-world
         id: meta-hello

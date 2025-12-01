@@ -1,52 +1,96 @@
+import { useMutation, useQuery } from '@apollo/client/react';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, Circle, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, Circle, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-
-interface Todo {
-  id: string;
-  title: string;
-  completed: boolean;
-}
+import { CREATE_TODO, DELETE_TODO, UPDATE_TODO } from '../graphql/mutations';
+import { GET_TODOS } from '../graphql/queries';
+import { Todo, TodoStatus } from '../types/todo';
 
 type TodoFilter = 'all' | 'active' | 'completed';
 
+interface GetTodosData {
+  todos: Todo[];
+}
+
 export default function TodoHome() {
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [filter, setFilter] = useState<TodoFilter>('all');
 
-  const addTodo = (event: React.FormEvent) => {
+  const { data, loading, error } = useQuery<GetTodosData>(GET_TODOS);
+  const [createTodo] = useMutation(CREATE_TODO, {
+    refetchQueries: [{ query: GET_TODOS }],
+  });
+  const [updateTodo] = useMutation(UPDATE_TODO, {
+    refetchQueries: [{ query: GET_TODOS }],
+  });
+  const [deleteTodo] = useMutation(DELETE_TODO, {
+    refetchQueries: [{ query: GET_TODOS }],
+  });
+
+  const todos: Todo[] = useMemo(() => data?.todos || [], [data?.todos]);
+
+  const addTodo = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!newTodoTitle.trim()) return;
 
-    const newTodo: Todo = {
-      id: crypto.randomUUID(),
-      title: newTodoTitle.trim(),
-      completed: false,
-    };
-
-    setTodos((previous) => [...previous, newTodo]);
-    setNewTodoTitle('');
+    try {
+      await createTodo({
+        variables: {
+          title: newTodoTitle.trim(),
+          details: '',
+        },
+      });
+      setNewTodoTitle('');
+    } catch (error) {
+      console.error('Failed to create todo:', error);
+    }
   };
 
-  const toggleTodo = (id: string) => {
-    setTodos((previous) =>
-      previous.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+  const toggleTodo = async (todo: Todo) => {
+    const newStatus =
+      todo.status === TodoStatus.Completed
+        ? TodoStatus.Todo
+        : TodoStatus.Completed;
+
+    try {
+      await updateTodo({
+        variables: {
+          id: todo.id,
+          title: todo.title,
+          details: todo.details || '',
+        },
+        optimisticResponse: {
+          updateTodo: {
+            ...todo,
+            status: newStatus,
+            __typename: 'Todo',
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update todo:', error);
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    setTodos((previous) => previous.filter((todo) => todo.id !== id));
+  const handleDeleteTodo = async (id: string) => {
+    try {
+      await deleteTodo({
+        variables: { id },
+        optimisticResponse: {
+          deleteTodo: true,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to delete todo:', error);
+    }
   };
 
   const activeTodos = useMemo(
-    () => todos.filter((todo) => !todo.completed),
+    () => todos.filter((todo) => todo.status !== TodoStatus.Completed),
     [todos]
   );
   const completedTodos = useMemo(
-    () => todos.filter((todo) => todo.completed),
+    () => todos.filter((todo) => todo.status === TodoStatus.Completed),
     [todos]
   );
 
@@ -92,12 +136,31 @@ export default function TodoHome() {
     },
   };
 
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+          <h2 className="mb-2 text-xl font-semibold text-red-900">
+            Error loading todos
+          </h2>
+          <p className="text-red-700">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-12 text-center">
           <h1 className="mb-4 text-5xl font-bold text-gray-900">My Tasks</h1>
           <p className="text-lg text-gray-600">Simple, focused, and minimal</p>
+          {loading && (
+            <div className="mt-4 flex items-center justify-center gap-2 text-gray-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Loading todos...</span>
+            </div>
+          )}
         </header>
 
         <div className="mb-8 grid gap-4 sm:grid-cols-3">
@@ -177,7 +240,7 @@ export default function TodoHome() {
                 key={todo.id}
                 todo={todo}
                 onToggle={toggleTodo}
-                onDelete={deleteTodo}
+                onDelete={handleDeleteTodo}
               />
             ))}
           </div>
@@ -199,12 +262,12 @@ export default function TodoHome() {
 
 interface TodoItemProps {
   todo: Todo;
-  onToggle: (id: string) => void;
+  onToggle: (todo: Todo) => void;
   onDelete: (id: string) => void;
 }
 
 function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
-  const completed = todo.completed;
+  const completed = todo.status === TodoStatus.Completed;
 
   return (
     <div
@@ -217,7 +280,7 @@ function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
     >
       <button
         type="button"
-        onClick={() => onToggle(todo.id)}
+        onClick={() => onToggle(todo)}
         className={cn(
           'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors focus:outline-none',
           completed

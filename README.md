@@ -2,9 +2,83 @@
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+✨ A full-stack todo application built with Nx monorepo ✨
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Architecture
+
+This workspace contains a full-stack todo application with the following components:
+
+- **Frontend** (`packages/frontend`) - React + TypeScript + Tailwind CSS + Apollo Client
+- **GraphQL BFF** (`packages/graphql-bff`) - Apollo Server (Backend for Frontend)
+- **Backend API** (`packages/backend`) - .NET REST API with DynamoDB
+- **E2E Tests** (`packages/frontend-e2e`, `packages/graphql-bff-e2e`) - Playwright & Jest
+
+```
+Frontend (React + Apollo Client)
+    ↓
+GraphQL BFF (Apollo Server)
+    ↓
+Backend API (.NET + DynamoDB)
+```
+
+## Quick Start
+
+### Local Development
+
+1. **Start the Backend API**:
+   ```sh
+   cd packages/backend
+   dotnet run
+   # Runs on http://localhost:5040
+   ```
+
+2. **Start the GraphQL BFF**:
+   ```sh
+   npx nx serve graphql-bff
+   # Runs on http://localhost:4000
+   ```
+
+3. **Start the Frontend**:
+   ```sh
+   npx nx serve frontend
+   # Runs on http://localhost:4200
+   ```
+
+### Docker Development
+
+Run all services together with Docker Compose:
+
+```sh
+docker-compose up
+```
+
+- Frontend: http://localhost:3000
+- GraphQL BFF: http://localhost:4000
+- Backend: http://localhost:5040
+
+## Building Docker Images
+
+Each component has its own Dockerfile:
+
+```sh
+# Frontend
+docker build -f packages/frontend/Dockerfile -t todo-frontend:latest .
+
+# GraphQL BFF
+docker build -f packages/graphql-bff/Dockerfile -t todo-graphql-bff:latest .
+
+# Backend
+docker build -f packages/backend/Dockerfile -t todo-backend:latest .
+```
+
+## CI/CD
+
+The `.github/workflows/docker-publish.yml` workflow automatically:
+- Detects which projects are affected by changes
+- Builds and pushes Docker images to GitHub Container Registry
+- Only builds images for changed projects (Nx-powered)
+
+Images are published to `ghcr.io/<owner>/todo-app/<service>:latest`
 
 ## Finish your CI setup
 
