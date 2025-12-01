@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logger } from '../logger';
 
 export interface Todo {
   id: string;
@@ -19,33 +20,68 @@ export class TodoDataSource {
   }
 
   async getAllTodos(): Promise<Todo[]> {
-    const response = await axios.get<Todo[]>(`${this.baseURL}/api/todo`);
-    return response.data;
+    logger.debug({ url: `${this.baseURL}/api/todo` }, 'DataSource: GET all todos');
+    try {
+      const response = await axios.get<Todo[]>(`${this.baseURL}/api/todo`);
+      logger.debug({ count: response.data.length, status: response.status }, 'DataSource: GET all todos - success');
+      return response.data;
+    } catch (error) {
+      logger.error({ error, url: `${this.baseURL}/api/todo` }, 'DataSource: GET all todos - failed');
+      throw error;
+    }
   }
 
   async getTodoById(id: string): Promise<Todo> {
-    const response = await axios.get<Todo>(`${this.baseURL}/api/todo/${id}`);
-    return response.data;
+    logger.debug({ id, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: GET todo by ID');
+    try {
+      const response = await axios.get<Todo>(`${this.baseURL}/api/todo/${id}`);
+      logger.debug({ id, status: response.status }, 'DataSource: GET todo by ID - success');
+      return response.data;
+    } catch (error) {
+      logger.error({ error, id, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: GET todo by ID - failed');
+      throw error;
+    }
   }
 
   async createTodo(title: string, details?: string): Promise<Todo> {
-    const response = await axios.post<Todo>(`${this.baseURL}/api/todo`, {
-      title,
-      details,
-    });
-    return response.data;
+    logger.debug({ title, hasDetails: !!details, url: `${this.baseURL}/api/todo` }, 'DataSource: POST create todo');
+    try {
+      const response = await axios.post<Todo>(`${this.baseURL}/api/todo`, {
+        title,
+        details,
+      });
+      logger.debug({ id: response.data.id, title, status: response.status }, 'DataSource: POST create todo - success');
+      return response.data;
+    } catch (error) {
+      logger.error({ error, title, url: `${this.baseURL}/api/todo` }, 'DataSource: POST create todo - failed');
+      throw error;
+    }
   }
 
   async updateTodo(id: string, title: string, details?: string): Promise<Todo> {
-    const response = await axios.put<Todo>(`${this.baseURL}/api/todo/${id}`, {
-      title,
-      details,
-    });
-    return response.data;
+    logger.debug({ id, title, hasDetails: !!details, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: PUT update todo');
+    try {
+      const response = await axios.put<Todo>(`${this.baseURL}/api/todo/${id}`, {
+        title,
+        details,
+      });
+      logger.debug({ id, title, status: response.status }, 'DataSource: PUT update todo - success');
+      return response.data;
+    } catch (error) {
+      logger.error({ error, id, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: PUT update todo - failed');
+      throw error;
+    }
   }
 
   async deleteTodo(id: string): Promise<boolean> {
-    await axios.delete(`${this.baseURL}/api/todo/${id}`);
-    return true;
+    logger.debug({ id, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: DELETE todo');
+    try {
+      await axios.delete(`${this.baseURL}/api/todo/${id}`);
+      logger.debug({ id }, 'DataSource: DELETE todo - success');
+      return true;
+    } catch (error) {
+      logger.error({ error, id, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: DELETE todo - failed');
+      throw error;
+    }
   }
 }
