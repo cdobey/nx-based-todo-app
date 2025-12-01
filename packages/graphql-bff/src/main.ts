@@ -15,10 +15,10 @@ const server = new ApolloServer({
   plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
 });
 
-const backendBaseUrl = process.env.TODO_BACKEND_URL || process.env.BACKEND_URL;
+const backendBaseUrl = process.env.BACKEND_URL;
 if (!backendBaseUrl) {
   console.warn(
-    'WARNING: TODO_BACKEND_URL/BACKEND_URL not set. Falling back to http://localhost:5040'
+    'WARNING: BACKEND_URL not set. Falling back to http://localhost:5040'
   );
 }
 

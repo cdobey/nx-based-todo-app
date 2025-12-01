@@ -11,12 +11,9 @@ export class TodoDataSource {
   private baseURL: string;
 
   constructor(baseURL?: string) {
-    const resolved =
-      baseURL || process.env.TODO_BACKEND_URL || process.env.BACKEND_URL;
+    const resolved = baseURL || process.env.BACKEND_URL;
     if (!resolved) {
-      throw new Error(
-        'Backend base URL is not configured. Set TODO_BACKEND_URL or BACKEND_URL.'
-      );
+      throw new Error('Backend base URL is not configured. Set BACKEND_URL.');
     }
     this.baseURL = resolved;
   }

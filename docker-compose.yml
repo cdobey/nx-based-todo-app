@@ -18,7 +18,7 @@ services:
       - "4000:4000"
     environment:
       - PORT=4000
-      - TODO_BACKEND_URL=http://backend:5040
+      - BACKEND_URL=http://backend:5040
     depends_on:
       - backend
 
