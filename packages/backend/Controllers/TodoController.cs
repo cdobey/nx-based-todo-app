@@ -49,6 +49,10 @@ namespace backend.Controllers
             }
             oldTodo.Title = item.Title;
             oldTodo.Details = item.Details;
+            if (item.Status.HasValue)
+            {
+                oldTodo.Status = item.Status.Value;
+            }
             
             await context.SaveAsync(oldTodo);
             return Ok(oldTodo);

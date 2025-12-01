@@ -1,5 +1,5 @@
-import { logger } from './logger';
 import { TodoDataSource } from './datasources/todoDataSource';
+import { logger } from './logger';
 
 interface Context {
   dataSources: {
@@ -36,19 +36,40 @@ export const resolvers = {
       { title, details }: { title: string; details?: string },
       { dataSources }: Context
     ) => {
-      logger.info({ title, hasDetails: !!details }, 'Mutation: createTodo - creating new todo');
+      logger.info(
+        { title, hasDetails: !!details },
+        'Mutation: createTodo - creating new todo'
+      );
       const result = await dataSources.todoAPI.createTodo(title, details);
       logger.info({ id: result.id, title }, 'Mutation: createTodo - completed');
       return result;
     },
     updateTodo: async (
       _parent: unknown,
-      { id, title, details }: { id: string; title: string; details?: string },
+      {
+        id,
+        title,
+        details,
+        status,
+      }: {
+        id: string;
+        title?: string;
+        details?: string;
+        status?: 'Todo' | 'InProgress' | 'Completed';
+      },
       { dataSources }: Context
     ) => {
-      logger.info({ id, title, hasDetails: !!details }, 'Mutation: updateTodo - updating todo');
-      const result = await dataSources.todoAPI.updateTodo(id, title, details);
-      logger.info({ id, title }, 'Mutation: updateTodo - completed');
+      logger.info(
+        { id, title, hasDetails: !!details, status },
+        'Mutation: updateTodo - updating todo'
+      );
+      const result = await dataSources.todoAPI.updateTodo(
+        id,
+        title,
+        details,
+        status
+      );
+      logger.info({ id, title, status }, 'Mutation: updateTodo - completed');
       return result;
     },
     deleteTodo: async (

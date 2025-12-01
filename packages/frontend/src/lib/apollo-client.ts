@@ -6,9 +6,10 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL || '__VITE_GRAPHQL_URL__';
 
 // Fallback to localhost only if placeholder wasn't replaced
-const resolvedURL = GRAPHQL_URL === '__VITE_GRAPHQL_URL__' 
-  ? 'http://localhost:4000' 
-  : GRAPHQL_URL;
+const resolvedURL =
+  GRAPHQL_URL === '__VITE_GRAPHQL_URL__'
+    ? 'http://localhost:4000'
+    : GRAPHQL_URL;
 
 const httpLink = createHttpLink({
   uri: resolvedURL,

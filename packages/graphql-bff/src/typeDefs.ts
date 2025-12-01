@@ -19,7 +19,7 @@ export const typeDefs = `#graphql
 
   type Mutation {
     createTodo(title: String!, details: String): Todo!
-    updateTodo(id: ID!, title: String!, details: String): Todo!
+    updateTodo(id: ID!, title: String, details: String, status: TodoStatus): Todo!
     deleteTodo(id: ID!): Boolean!
   }
 `;

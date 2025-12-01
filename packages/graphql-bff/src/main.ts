@@ -44,9 +44,7 @@ const server = new ApolloServer({
 
 const backendBaseUrl = process.env.BACKEND_URL;
 if (!backendBaseUrl) {
-  logger.warn(
-    'BACKEND_URL not set. Falling back to http://localhost:5040'
-  );
+  logger.warn('BACKEND_URL not set. Falling back to http://localhost:5040');
 } else {
   logger.info({ backendUrl: backendBaseUrl }, 'Backend URL configured');
 }
