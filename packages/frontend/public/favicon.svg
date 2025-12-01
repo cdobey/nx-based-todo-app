@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <!-- Background circle -->
-  <circle cx="50" cy="50" r="45" fill="#3b82f6" stroke="#1e40af" stroke-width="3"/>
+  <circle cx="50" cy="50" r="45" fill="#111827" stroke="#1f2937" stroke-width="3"/>
   
   <!-- Checkmark -->
   <path d="M 30 50 L 42 62 L 70 34" 
