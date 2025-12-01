@@ -6,8 +6,8 @@
 set -e
 
 # Replace placeholder with actual environment variable
-# Default to /graphql if GRAPHQL_URL is not set
-GRAPHQL_URL=${GRAPHQL_URL:-/graphql}
+# Check VITE_GRAPHQL_URL first (Coolify standard), then GRAPHQL_URL, default to /graphql
+GRAPHQL_URL=${VITE_GRAPHQL_URL:-${GRAPHQL_URL:-/graphql}}
 
 echo "Injecting GRAPHQL_URL: $GRAPHQL_URL"
 
