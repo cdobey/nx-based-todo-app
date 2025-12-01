@@ -26,6 +26,7 @@ Backend API (.NET + DynamoDB)
 ### Local Development
 
 1. **Start the Backend API**:
+
    ```sh
    cd packages/backend
    dotnet run
@@ -33,6 +34,7 @@ Backend API (.NET + DynamoDB)
    ```
 
 2. **Start the GraphQL BFF**:
+
    ```sh
    npx nx serve graphql-bff
    # Runs on http://localhost:4000
@@ -74,6 +76,7 @@ docker build -f packages/backend/Dockerfile -t todo-backend:latest .
 ## CI/CD
 
 The `.github/workflows/docker-publish.yml` workflow automatically:
+
 - Detects which projects are affected by changes
 - Builds and pushes Docker images to GitHub Container Registry
 - Only builds images for changed projects (Nx-powered)
@@ -83,7 +86,6 @@ Images are published to `ghcr.io/<owner>/todo-app/<service>:latest`
 ## Finish your CI setup
 
 [Click here to finish setting up your workspace!](https://cloud.nx.app/connect/EJFczf4ba1)
-
 
 ## Generate a library
 
@@ -139,7 +141,6 @@ npx nx sync:check
 
 [Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
 
-
 [Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
 ## Install Nx Console
@@ -152,12 +153,13 @@ Nx Console is an editor extension that enriches your developer experience. It le
 
 Learn more:
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
+- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
 And join the Nx community:
+
 - [Discord](https://go.nx.dev/community)
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)

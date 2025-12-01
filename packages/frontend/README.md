@@ -15,15 +15,19 @@ Backend API (.NET)
 ## Local Development
 
 1. **Start the GraphQL BFF**:
+
    ```bash
    npx nx serve graphql-bff
    ```
+
    The GraphQL BFF will run on `http://localhost:4000`
 
 2. **Start the Frontend**:
+
    ```bash
    npx nx serve frontend
    ```
+
    The frontend will run on `http://localhost:4200`
 
 3. **Environment Configuration**:

@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@apollo/client/react';
 import { cn } from '@/lib/utils';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { CheckCircle2, Circle, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { CREATE_TODO, DELETE_TODO, UPDATE_TODO } from '../graphql/mutations';

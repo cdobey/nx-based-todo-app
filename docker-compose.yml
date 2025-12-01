@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: packages/frontend/Dockerfile
     ports:
-      - '3000:80'
+      - "3000:80"
     environment:
       - GRAPHQL_URL=http://localhost:4000
     depends_on:
@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: packages/graphql-bff/Dockerfile
     ports:
-      - '4000:4000'
+      - "4000:4000"
     environment:
       - PORT=4000
       - TODO_BACKEND_URL=http://backend:5040
@@ -27,7 +27,7 @@ services:
       context: packages/backend
       dockerfile: Dockerfile
     ports:
-      - '5040:5040'
+      - "5040:5040"
     environment:
       - ASPNETCORE_URLS=http://+:5040
       - ASPNETCORE_ENVIRONMENT=Development

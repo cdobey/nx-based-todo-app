@@ -50,14 +50,14 @@ jobs:
             echo "frontend=false" >> $GITHUB_OUTPUT
           fi
           if grep -q "graphql-bff" affected.txt; then
-      - name: Skip message
-        if: steps.affected.outputs.backend == 'false' && steps.affected.outputs.frontend == 'false' && steps.affected.outputs.graphql-bff == 'false'
-        run: echo "No affected projects requiring Docker builds"
+            echo "graphql-bff=true" >> $GITHUB_OUTPUT
+          else
+            echo "graphql-bff=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Skip message
-        if: steps.affected.outputs.backend == 'false' && steps.affected.outputs.graphql-bff == 'false'
-        run: echo "Backend and GraphQL BFF not affected, skipping Docker builds"
+        if: steps.affected.outputs.backend == 'false' && steps.affected.outputs.frontend == 'false' && steps.affected.outputs.graphql-bff == 'false'
+        run: echo "No affected projects requiring Docker builds"
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
