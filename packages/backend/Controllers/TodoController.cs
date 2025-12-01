@@ -19,7 +19,7 @@ namespace backend.Controllers
 
         // GET api/<TodoController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Todo>> Get(int id)
+        public async Task<ActionResult<Todo>> Get(Guid id)
         {
             var dbItem = await context.LoadAsync<Todo>(id);
             return Ok(dbItem);
@@ -40,9 +40,13 @@ namespace backend.Controllers
 
         // PUT api/<TodoController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<Todo>> Put(int id, [FromBody] UpdateTodoDto item)
+        public async Task<ActionResult<Todo>> Put(Guid id, [FromBody] UpdateTodoDto item)
         {
             var oldTodo = await context.LoadAsync<Todo>(id);
+            if (oldTodo == null)
+            {
+                return NotFound(new { message = $"Todo with id {id} not found" });
+            }
             oldTodo.Title = item.Title;
             oldTodo.Details = item.Details;
             
@@ -52,7 +56,7 @@ namespace backend.Controllers
         
         // DELETE api/<TodoController>/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             try
             {

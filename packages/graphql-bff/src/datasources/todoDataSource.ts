@@ -23,8 +23,20 @@ export class TodoDataSource {
     logger.debug({ url: `${this.baseURL}/api/todo` }, 'DataSource: GET all todos');
     try {
       const response = await axios.get<Todo[]>(`${this.baseURL}/api/todo`);
-      logger.debug({ count: response.data.length, status: response.status }, 'DataSource: GET all todos - success');
-      return response.data;
+      // Filter out invalid todos with null/empty titles
+      const validTodos = response.data.filter(todo => {
+        if (!todo.title) {
+          logger.warn({ todo }, 'DataSource: Skipping todo with null/empty title');
+          return false;
+        }
+        return true;
+      });
+      logger.debug({ 
+        totalCount: response.data.length, 
+        validCount: validTodos.length,
+        status: response.status 
+      }, 'DataSource: GET all todos - success');
+      return validTodos;
     } catch (error) {
       logger.error({ error, url: `${this.baseURL}/api/todo` }, 'DataSource: GET all todos - failed');
       throw error;
@@ -35,6 +47,10 @@ export class TodoDataSource {
     logger.debug({ id, url: `${this.baseURL}/api/todo/${id}` }, 'DataSource: GET todo by ID');
     try {
       const response = await axios.get<Todo>(`${this.baseURL}/api/todo/${id}`);
+      if (!response.data.title) {
+        logger.error({ id, todo: response.data }, 'DataSource: Todo has null/empty title');
+        throw new Error(`Todo with id ${id} has invalid title`);
+      }
       logger.debug({ id, status: response.status }, 'DataSource: GET todo by ID - success');
       return response.data;
     } catch (error) {
